@@ -18,10 +18,6 @@ def chat(
 ):
     user_id = current_user.id
     
-    print("current_user:", current_user)
-    print("current_user.id:", current_user.id)
-    print("current_user.username:", current_user.username)
-    print("current_user.email:", current_user.email)
 
     # 保存用户消息
     user_msg = models.ChatMessage(user_id=user_id, role="user", content=question)
@@ -40,7 +36,7 @@ def chat(
     messages = [
         {
             "role": "system",
-            "content": "You are a helpful AI assistant. Answer clearly and logically. Use step-by-step reasoning."
+            "content": ""
         }
     ]
 
@@ -51,8 +47,13 @@ def chat(
     try:
         response = requests.post(
             OLLAMA_URL,
-            json={"model": "qwen2:1.5b", "messages": messages, "stream": False},
-            timeout=30  # 防止长时间卡住
+            json={
+                # "model": "qwen2:1.5b",
+                "model": "Gemma2:latest",
+                #   "model": "deepseek-r1:1.5b",
+                  "messages": messages, 
+                  "stream": False},
+            timeout=500  #止长时间卡住
         )
         response.raise_for_status()
         data = response.json()
