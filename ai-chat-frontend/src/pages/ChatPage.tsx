@@ -31,10 +31,14 @@ export default function ChatPage() {
     getHistory()
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
-          const loaded: Message[] = data.flatMap((item: { question: string; answer: string }) => [
-            { role: "user" as const, content: item.question },
-            { role: "ai" as const, content: item.answer },
-          ]);
+          const loaded: Message[] = data
+            .filter((item: { role: string; content: string }) =>
+              item.role === "user" || item.role === "assistant"
+            )
+            .map((item: { role: string; content: string }) => ({
+              role: item.role === "assistant" ? "ai" as const : "user" as const,
+              content: item.content,
+            }));
           setMessages(loaded);
         }
       })
