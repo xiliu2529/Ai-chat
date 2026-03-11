@@ -1,6 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser, sendChat, getHistory, deleteHistory } from "../api/auth";
+import {
+  getCurrentUser,
+  sendChat,
+  getHistory,
+  deleteHistory,
+} from "../api/auth";
 
 interface Message {
   role: "user" | "ai";
@@ -32,18 +37,20 @@ export default function ChatPage() {
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           const loaded: Message[] = data
-            .filter((item: { role: string; content: string }) =>
-              item.role === "user" || item.role === "assistant"
+            .filter(
+              (item: { role: string; content: string }) =>
+                item.role === "user" || item.role === "assistant",
             )
             .map((item: { role: string; content: string }) => ({
-              role: item.role === "assistant" ? "ai" as const : "user" as const,
+              role:
+                item.role === "assistant" ? ("ai" as const) : ("user" as const),
               content: item.content,
             }));
           setMessages(loaded);
         }
       })
       .catch(() => {}); // 历史记录加载失败不阻断主流程
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 自动滚动到底部
@@ -66,17 +73,26 @@ export default function ChatPage() {
     if (!input.trim() || loading) return;
 
     const question = input.trim();
-    const newMessages: Message[] = [...messages, { role: "user", content: question }];
+    const newMessages: Message[] = [
+      ...messages,
+      { role: "user", content: question },
+    ];
     setMessages(newMessages);
     setInput("");
     setLoading(true);
 
     try {
       const data = await sendChat(question);
-      setMessages([...newMessages, { role: "ai", content: data.answer ?? data.response ?? "无回复" }]);
+      setMessages([
+        ...newMessages,
+        { role: "ai", content: data.answer ?? data.response ?? "无回复" },
+      ]);
     } catch (err) {
       console.error(err);
-      setMessages([...newMessages, { role: "ai", content: "⚠ 连接失败，请检查服务是否运行" }]);
+      setMessages([
+        ...newMessages,
+        { role: "ai", content: "⚠ 连接失败，请检查服务是否运行" },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -106,10 +122,13 @@ export default function ChatPage() {
         <header style={styles.header}>
           <div style={styles.headerLeft}>
             <span style={styles.headerLogo}>🤖</span>
-            <span style={styles.headerTitle}>AI 学习助手</span>
+            <span style={styles.headerTitle}>AI助手</span>
           </div>
           <div style={styles.headerRight} ref={menuRef}>
-            <div style={styles.userArea} onClick={() => setShowUserMenu(!showUserMenu)}>
+            <div
+              style={styles.userArea}
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            >
               <div style={styles.avatar}>{currentUser[0]?.toUpperCase()}</div>
               <span style={styles.userName}>{currentUser}</span>
               <span style={styles.chevron}>{showUserMenu ? "▲" : "▼"}</span>
@@ -117,7 +136,9 @@ export default function ChatPage() {
             {showUserMenu && (
               <div style={styles.userMenu}>
                 <div style={styles.userMenuHeader}>
-                  <div style={styles.menuAvatar}>{currentUser[0]?.toUpperCase()}</div>
+                  <div style={styles.menuAvatar}>
+                    {currentUser[0]?.toUpperCase()}
+                  </div>
                   <div>
                     <div style={styles.menuName}>{currentUser}</div>
                     <div style={styles.menuRole}>学习者</div>
@@ -126,7 +147,10 @@ export default function ChatPage() {
                 <div style={styles.menuDivider} />
                 <button
                   style={styles.menuItemNormal}
-                  onClick={() => { setShowClearConfirm(true); setShowUserMenu(false); }}
+                  onClick={() => {
+                    setShowClearConfirm(true);
+                    setShowUserMenu(false);
+                  }}
                 >
                   🗑 清除聊天记录
                 </button>
@@ -147,7 +171,9 @@ export default function ChatPage() {
                 <div style={styles.emptyState}>
                   <div style={styles.emptyIcon}>💬</div>
                   <div style={styles.emptyText}>开始与 AI 对话吧！</div>
-                  <div style={styles.emptySubText}>输入您的问题，AI 将为您解答</div>
+                  <div style={styles.emptySubText}>
+                    输入您的问题，AI 将为您解答
+                  </div>
                 </div>
               )}
               {messages.map((msg, idx) => (
@@ -155,25 +181,32 @@ export default function ChatPage() {
                   key={idx}
                   style={{
                     ...styles.messageRow,
-                    justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                    justifyContent:
+                      msg.role === "user" ? "flex-end" : "flex-start",
                   }}
                 >
                   {msg.role === "ai" && <div style={styles.aiAvatar}>🤖</div>}
                   <div
                     style={{
                       ...styles.bubble,
-                      ...(msg.role === "user" ? styles.userBubble : styles.aiBubble),
+                      ...(msg.role === "user"
+                        ? styles.userBubble
+                        : styles.aiBubble),
                     }}
                   >
                     {msg.content}
                   </div>
                   {msg.role === "user" && (
-                    <div style={styles.userAvatarSmall}>{currentUser[0]?.toUpperCase()}</div>
+                    <div style={styles.userAvatarSmall}>
+                      {currentUser[0]?.toUpperCase()}
+                    </div>
                   )}
                 </div>
               ))}
               {loading && (
-                <div style={{ ...styles.messageRow, justifyContent: "flex-start" }}>
+                <div
+                  style={{ ...styles.messageRow, justifyContent: "flex-start" }}
+                >
                   <div style={styles.aiAvatar}>🤖</div>
                   <div style={{ ...styles.bubble, ...styles.aiBubble }}>
                     <span className="typing-dot" />
@@ -197,7 +230,10 @@ export default function ChatPage() {
                 disabled={loading}
               />
               <button
-                style={{ ...styles.sendBtn, opacity: loading || !input.trim() ? 0.6 : 1 }}
+                style={{
+                  ...styles.sendBtn,
+                  opacity: loading || !input.trim() ? 0.6 : 1,
+                }}
                 onClick={sendMessage}
                 disabled={loading || !input.trim()}
               >
@@ -209,16 +245,27 @@ export default function ChatPage() {
 
         {/* 清除历史确认弹窗 */}
         {showClearConfirm && (
-          <div style={styles.modalOverlay} onClick={() => setShowClearConfirm(false)}>
+          <div
+            style={styles.modalOverlay}
+            onClick={() => setShowClearConfirm(false)}
+          >
             <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
               <div style={styles.modalIcon}>🗑</div>
               <div style={styles.modalTitle}>清除聊天记录</div>
-              <div style={styles.modalDesc}>确定要清除所有聊天记录吗？此操作不可恢复。</div>
+              <div style={styles.modalDesc}>
+                确定要清除所有聊天记录吗？此操作不可恢复。
+              </div>
               <div style={styles.modalActions}>
-                <button style={styles.modalCancelBtn} onClick={() => setShowClearConfirm(false)}>
+                <button
+                  style={styles.modalCancelBtn}
+                  onClick={() => setShowClearConfirm(false)}
+                >
                   取消
                 </button>
-                <button style={styles.modalConfirmBtn} onClick={handleClearHistory}>
+                <button
+                  style={styles.modalConfirmBtn}
+                  onClick={handleClearHistory}
+                >
                   确认清除
                 </button>
               </div>
@@ -397,7 +444,12 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "60px 0",
   },
   emptyIcon: { fontSize: "48px", marginBottom: "16px" },
-  emptyText: { fontSize: "17px", fontWeight: 600, color: "#ccc", marginBottom: "8px" },
+  emptyText: {
+    fontSize: "17px",
+    fontWeight: 600,
+    color: "#ccc",
+    marginBottom: "8px",
+  },
   emptySubText: { fontSize: "13px", color: "#ddd" },
   messageRow: {
     display: "flex",
@@ -498,8 +550,18 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 16px 48px rgba(0,0,0,0.15)",
   },
   modalIcon: { fontSize: "40px", marginBottom: "16px" },
-  modalTitle: { fontSize: "20px", fontWeight: 700, color: "#1a1a2e", marginBottom: "10px" },
-  modalDesc: { fontSize: "14px", color: "#888", marginBottom: "28px", lineHeight: 1.6 },
+  modalTitle: {
+    fontSize: "20px",
+    fontWeight: 700,
+    color: "#1a1a2e",
+    marginBottom: "10px",
+  },
+  modalDesc: {
+    fontSize: "14px",
+    color: "#888",
+    marginBottom: "28px",
+    lineHeight: 1.6,
+  },
   modalActions: { display: "flex", gap: "12px" },
   modalCancelBtn: {
     flex: 1,
